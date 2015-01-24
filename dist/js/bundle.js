@@ -11,7 +11,6 @@
 
 	app.controller('HelloCtrl', ['$scope', '$firebase', function($scope, $firebase) {
 	  $scope.test = 'Test varretjes';
-	  debugger;
 	}]);
 
 })();

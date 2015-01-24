@@ -4,7 +4,12 @@ var gulp = require('gulp'),
 		browserify = require('browserify'),
 		source = require('vinyl-source-stream'),
 		concat = require('gulp-concat'),
-		clean = require('gulp-clean');
+		clean = require('gulp-clean'),
+		sass = require('gulp-sass'),
+		autoprefixer = require('gulp-autoprefixer');
+
+// default task
+gulp.task('default', ['clean', 'browserify', 'views', 'styles', 'dev']);
 
 // watch files for changes and rebundle and lint
 gulp.task('watch', ['lint'], function() {
@@ -15,17 +20,12 @@ gulp.task('watch', ['lint'], function() {
 
 	gulp.watch(['app/index.html', 'app/views/**/*.html'], [
 		'views'
-	])
+	]);
+
+	gulp.watch(['app/styles/*.scss'], [
+		'styles'
+	]);
 });
-
-gulp.task('default', ['clean', 'browserify', 'views', 'dev']);
-
-// function() {
-// 	gulp.run('clean');
-// 	gulp.run('browserify');
-// 	gulp.run('views');
-// 	gulp.run('dev');
-// });
 
 gulp.task('clean', function() {
 	gulp.src('dist/*.html')
@@ -33,18 +33,21 @@ gulp.task('clean', function() {
 
 	gulp.src('dist/js/*')
 		.pipe(clean());
+
+	gulp.src('dist/css/*')
+		.pipe(clean());
 });
 
 // JSHint
 gulp.task('lint', function() {
 	gulp.src('./app/scripts/*.js')
-		.pipe(jshint())
+		.pipe(jshint())   
+
 		.pipe(jshint.reporter('default'));
 });
 
 // browserify to resolve front end dependencies
 gulp.task('browserify', function() {
-
 	return browserify('./app/scripts/app.js')
 		.bundle()
 		.pipe(source('bundle.js'))
@@ -64,7 +67,27 @@ gulp.task('views', function() {
 
 });
 
+gulp.task('styles', function() {
+	gulp.src('app/styles/*.scss')
+		.pipe(sass({onError: function(e) { console.log(e); } }))
+		.pipe(autoprefixer("last 2 versions", "> 1%", "ie 8"))
+		.pipe(gulp.dest('dist/css/'))
+		.pipe(refresh(lrserver));
+});
 
+gulp.task('dev', function() {
+
+	// start webserver
+	server.listen(serverport);
+
+	// start live reload
+	lrserver.listen(livereloadport);
+
+	// watch for any file changes
+	gulp.run('watch');
+});
+
+// EXPRESS WEBSERVER for local dev
 var embedlr = require('gulp-embedlr'),
 		refresh = require('gulp-livereload'),
 		lrserver = require('tiny-lr')(),
@@ -83,14 +106,3 @@ server.all('/*', function(req, res) {
 	res.sendFile('index.html', { root: 'dist' });
 });
 
-gulp.task('dev', function() {
-
-	// start webserver
-	server.listen(serverport);
-
-	// start live reload
-	lrserver.listen(livereloadport);
-
-	// watch for any file changes
-	gulp.run('watch');
-});
