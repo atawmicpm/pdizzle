@@ -31,6 +31,9 @@ gulp.task('clean', function() {
 	gulp.src('dist/*.html')
 		.pipe(clean());
 
+	gulp.src('dist/templates/*')
+		.pipe(clean());
+
 	gulp.src('dist/js/*')
 		.pipe(clean());
 
@@ -61,8 +64,8 @@ gulp.task('views', function() {
 		.pipe(gulp.dest('dist/'));
 		// .pipe(refresh(lrserver));
 
-	gulp.src('app/views/**/*')
-		.pipe(gulp.dest('dist/views/'))
+	gulp.src('app/templates/**/*')
+		.pipe(gulp.dest('dist/templates/'))
 		.pipe(refresh(lrserver));
 
 });

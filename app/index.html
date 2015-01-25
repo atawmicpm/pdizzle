@@ -1,25 +1,21 @@
 <!doctype html>
 
-<html lang="en" ng-app="myApp">
+<html lang="en" ng-app="pdizzle">
 
 <head>
   <title>My Awesome App</title>
   <link rel="stylesheet" type="text/css" href="css/app.css">
 
 </head>
-<body ng-controller="HelloCtrl">
+<body class="container" ng-controller="HelloCtrl">
 	<div class="row-fluid">
-		<div class="span8">
-			<ul class="nav nav-pills">
-			  <li role="presentation" class="active"><a href="#">Home</a></li>
-			  <li role="presentation"><a href="#">Profile</a></li>
-			  <li role="presentation"><a href="#">Messages</a></li>
-			</ul>
+		<div class="span12">
+
+			<navigation></navigation>
+
 		</div>
 	</div>
 
-  <h1>My Awesome App</h1>
-  <p>{{testVar}}</p> {{1 + 2}} hehehe
   <script src="js/bundle.js"></script>
 </body>
 </html>
