@@ -3,16 +3,18 @@
 <html lang="en" ng-app="pdizzle">
 
 <head>
-  <title>My Awesome App</title>
+	<base href="/">
+  <title>Phillip's World</title>
   <link rel="stylesheet" type="text/css" href="css/app.css">
 
 </head>
-<body class="container" ng-controller="HelloCtrl">
+<body class="container">
 	<div class="row-fluid">
 		<div class="span12">
 
 			<navigation></navigation>
 
+			<ng-view></ng-view>
 		</div>
 	</div>
 

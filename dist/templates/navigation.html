@@ -1,9 +1,23 @@
 <ul class="nav nav-pills nav-justified">
-  <li role="presentation" ng-class="{ active:navigation.isPage('blog') }"><a ng-click="navigation.setPage('blog')"  href="#">Blog</a></li>
-  <li role="presentation" ng-class="{ active:navigation.isPage('about') }"><a ng-click="navigation.setPage('about')" href="#">About Me</a></li>
-  <li role="presentation" ng-class="{ active:navigation.isPage('resume') }"><a ng-click="navigation.setPage('resume')"href="#">Resume</a></li>
-  <li role="presentation" ng-class="{ active:navigation.isPage('portfolio') }"><a ng-click="navigation.setPage('portfolio')" href="#">Portfolio</a></li>
-  <li role="presentation" ng-class="{ active:navigation.isPage('music') }"><a ng-click="navigation.setPage('music')" href="#">Music</a></li>
-</ul>
+  
+  <li role="presentation" ng-class="{ active:navigation.isPage('blog') }">
+  	<a ng-click="navigation.setPage('blog')" href="/blog">Blog</a>
+  </li>
 
-{{navigation.page}}
+  <li role="presentation" ng-class="{ active:navigation.isPage('about') }">
+  	<a ng-click="navigation.setPage('about')" href="/about">About Me</a>
+  </li>
+
+  <li role="presentation" ng-class="{ active:navigation.isPage('resume') }">
+  	<a ng-click="navigation.setPage('resume')" href="/resume">Resume</a>
+  </li>
+  
+  <li role="presentation" ng-class="{ active:navigation.isPage('portfolio') }">
+  	<a ng-click="navigation.setPage('portfolio')" href="/portfolio">Portfolio</a>
+  </li>
+  
+  <li role="presentation" ng-class="{ active:navigation.isPage('music') }">
+  	<a ng-click="navigation.setPage('music')" href="/music">Music</a>
+  </li>
+
+</ul>

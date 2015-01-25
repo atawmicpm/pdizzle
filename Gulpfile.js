@@ -18,7 +18,7 @@ gulp.task('watch', ['lint'], function() {
 		'browserify'
 	]);
 
-	gulp.watch(['app/index.html', 'app/views/**/*.html'], [
+	gulp.watch(['app/index.html', 'app/templates/**/*.html'], [
 		'views'
 	]);
 
