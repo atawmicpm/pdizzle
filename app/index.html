@@ -6,18 +6,43 @@
 	<base href="/">
   <title>Phillip's World</title>
   <link rel="stylesheet" type="text/css" href="css/app.css">
+  <!-- <link rel="stylesheet" type="text/css" href="css/flat-ui-pro.min.css"> -->
 
 </head>
-<body class="container">
-	<div class="row-fluid">
-		<div class="span12">
+<body ng-controller="MainController">
 
-			<navigation></navigation>
+	<navigation class="icon-bar large-vertical four-up">
 
-			<ng-view></ng-view>
-		</div>
+		<item name="About" icon="fa fa-buysellads"></item>
+		<item name="Resume" icon="fa fa-bed"></item>
+		<item name="Portfolio"></item>
+		<item name="Contact"></item>
+	
+	</navigation>
+
+
+	<div id="about">
+		<a name="about"></a>
+		<h3 data-magellan-destination="about">About</h3>
+	</div>
+
+	<div id="resume">
+		<a name="resume"></a>
+		<h3 data-magellan-destination="resume">Resume</h3>
+	</div>
+
+	<div id="portfolio">
+		<a name="portfolio"></a>
+		<h3 data-magellan-destination="portfolio">Portfolio</h3>
+	</div>
+
+	<div id="music">
+		<a name="music"></a>
+		<h3 data-magellan-destination="music">Music</h3>
 	</div>
 
   <script src="js/bundle.js"></script>
+
+</div>
 </body>
 </html>

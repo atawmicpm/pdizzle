@@ -35,9 +35,11 @@
     ]
   },
   "browser": {
-    "angular": "./node_modules/angular/angular.js"
+    "angular": "./node_modules/angular/angular.js",
+    "jquery": "./node_modules/jquery/dist/jquery.js"
   },
   "browserify-shim": {
-    "angular": "angular"
+    "angular": "angular",
+    "jquery": "jQuery:$"
   }
 }

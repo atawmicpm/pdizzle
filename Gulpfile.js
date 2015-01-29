@@ -39,6 +39,9 @@ gulp.task('clean', function() {
 
 	gulp.src('dist/css/*')
 		.pipe(clean());
+
+	gulp.src('dist/fonts/*')
+		.pipe(clean());
 });
 
 // JSHint
@@ -71,11 +74,17 @@ gulp.task('views', function() {
 });
 
 gulp.task('styles', function() {
-	gulp.src('app/styles/*.scss')
+	gulp.src('app/styles/app.scss')
 		.pipe(sass({onError: function(e) { console.log(e); } }))
 		.pipe(autoprefixer("last 2 versions", "> 1%", "ie 8"))
 		.pipe(gulp.dest('dist/css/'))
 		.pipe(refresh(lrserver));
+
+	gulp.src('app/styles/*.css')
+		.pipe(gulp.dest('dist/css/'));
+
+	gulp.src('app/styles/font-awesome/fonts/*')
+		.pipe(gulp.dest('dist/fonts/'));
 });
 
 gulp.task('dev', function() {

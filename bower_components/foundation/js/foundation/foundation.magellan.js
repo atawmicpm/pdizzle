@@ -48,7 +48,7 @@
           // Account for expedition height if fixed position
           var scroll_top = target.offset().top - settings.destination_threshold + 1;
           if (settings.offset_by_height) {
-            scroll_top = scroll_top - expedition.outerHeight();
+            // scroll_top = scroll_top - expedition.outerHeight();
           }
 
           $('html, body').stop().animate({
