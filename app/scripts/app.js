@@ -1,139 +1,139 @@
 (function() {
 
-	'use strict';
+  'use strict';
 
-	// Gulp calls Browserify to compile these scripts into bundle.js
-	require('angular');
-	require('../../bower_components/ngSmoothScroll/angular-smooth-scroll');
-
-
-	// My App
-	var app = angular.module('pdizzle', ['smoothScroll']);
+  // Gulp calls Browserify to compile these scripts into bundle.js
+  require('angular');
+  require('../../bower_components/ngSmoothScroll/angular-smooth-scroll');
 
 
-	// Main Controller, not being used for anything yet
-	app.controller('MainController', ['$scope', function($scope) {
-		// placeholder so gulp doesn't complain about $scope not being used
-		$scope.placeholder = '';
+  // My App
+  var app = angular.module('pdizzle', ['smoothScroll']);
 
-	}]);
 
-	// Navigation directive, this 
-	app.directive('navigation', ['smoothScroll', function(smoothScroll) {
-		return {
-			// why pollute parent scope?
-			scope: {},
-			restrict: 'EA',
+  // Main Controller, not being used for anything yet
+  app.controller('MainController', ['$scope', function($scope) {
+    // placeholder so gulp doesn't complain about $scope not being used
+    $scope.placeholder = '';
 
-			controller: function($scope) {
-				$scope.items = [];
+  }]);
 
-				$scope.setActive = function(elem) {
-					// this is a double forEach since it gets called after the
-					// forEach in the link function.  This seems like it can be
-					// optimized, however, wouldn't jQuery be doing the same
-					// thing by calling $('.item').removeClass('active') ?
-					angular.forEach($scope.items, function(item) {
-						item.elem.removeClass('active');
-					});
+  // Navigation directive, this 
+  app.directive('navigation', ['smoothScroll', function(smoothScroll) {
+    return {
+      // why pollute parent scope?
+      scope: {},
+      restrict: 'EA',
 
-					elem.addClass('active');
-				};
+      controller: function($scope) {
+        $scope.items = [];
 
-				this.scrollTo = function(section) {
-					var section = document.getElementById(section);
-					smoothScroll(section);
-				};
+        $scope.setActive = function(elem) {
+          // this is a double forEach since it gets called after the
+          // forEach in the link function.  This seems like it can be
+          // optimized, however, wouldn't jQuery be doing the same
+          // thing by calling $('.item').removeClass('active') ?
+          angular.forEach($scope.items, function(item) {
+            item.elem.removeClass('active');
+          });
 
-				this.addItem = function(elem, name) {
-					var top = document.getElementById(name).offsetTop,
-							bottom = top + document.getElementById(name).offsetHeight;
+          elem.addClass('active');
+        };
 
-					$scope.items.push({
-						elem: elem,
-						top: top,
-						bottom: bottom
-					});
-				};
-			},
+        this.scrollTo = function(section) {
+          var section = document.getElementById(section);
+          smoothScroll(section);
+        };
 
-			link: function(scope, elem, attrs) {
-				angular.element(window).bind('scroll', function() {
-					var scrollPos = window.scrollY;
+        this.addItem = function(elem, name) {
+          var top = document.getElementById(name).offsetTop,
+              bottom = top + document.getElementById(name).offsetHeight;
 
-					angular.forEach(scope.items, function(item) {
-						if (item.top <= scrollPos && item.bottom >= scrollPos) {
-							scope.setActive(item.elem);
-						}
-					});
-				});
-			}
-		};
-	}]);
+          $scope.items.push({
+            elem: elem,
+            top: top,
+            bottom: bottom
+          });
+        };
+      },
 
-	// Navigation items add themselves to navigation directive controller
-	app.directive('item', function() {
-		return {
-			scope: {},
-			restrict: 'E',
-			require: '^navigation',
-			replace: true,
+      link: function(scope, elem, attrs) {
+        angular.element(window).bind('scroll', function() {
+          var scrollPos = window.scrollY;
 
-			template: '<a class="item"><i class="{{icon}}"></i><label>{{name}}</label></a>',
+          angular.forEach(scope.items, function(item) {
+            if (item.top <= scrollPos && item.bottom >= scrollPos) {
+              scope.setActive(item.elem);
+            }
+          });
+        });
+      }
+    };
+  }]);
 
-			link: function(scope, elem, attrs, navController) {
-				scope.name = attrs.name;
-				scope.icon = attrs.icon;
+  // Navigation items add themselves to navigation directive controller
+  app.directive('item', function() {
+    return {
+      scope: {},
+      restrict: 'E',
+      require: '^navigation',
+      replace: true,
 
-				navController.addItem(elem, scope.name);
+      template: '<a class="item"><i class="{{icon}}"></i><label>{{name}}</label></a>',
 
-				elem.bind('click', function() {
-					navController.scrollTo(scope.name);
-				});
+      link: function(scope, elem, attrs, navController) {
+        scope.name = attrs.name;
+        scope.icon = attrs.icon;
 
-			}
-		};
-	});
+        navController.addItem(elem, scope.name);
 
-	// About template
-	app.directive('about', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/about.html'
-		};
-	});
+        elem.bind('click', function() {
+          navController.scrollTo(scope.name);
+        });
 
-	// Resume template
-	app.directive('resume', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/resume.html'
-		};
-	});
+      }
+    };
+  });
 
-	// Projects template
-	app.directive('projects', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/projects.html'
-		};
-	});
+  // About template
+  app.directive('about', function() {
+    return {
+      restrict: 'EA',
+      templateUrl: 'templates/about.html'
+    };
+  });
 
-	// Music template
-	app.directive('music', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/music.html'
-		};
-	});
+  // Resume template
+  app.directive('resume', function() {
+    return {
+      restrict: 'EA',
+      templateUrl: 'templates/resume.html'
+    };
+  });
 
-	// directive needs to have HTML for navigation
-	// CSS must position the navigation correctly initially
-	// directive will reposition the navigation on window size change and scroll
-	// directive will determine all anchor point names based on link
-	// names eg. a href="#resume" will scrollTo <a target="#resume">
-	// directive will determine sizes and locations of all page sections
-	// directive will do a smooth scrollTo
-	// directive will update navigation active as it passes each directive
+  // Projects template
+  app.directive('projects', function() {
+    return {
+      restrict: 'EA',
+      templateUrl: 'templates/projects.html'
+    };
+  });
+
+  // Music template
+  app.directive('music', function() {
+    return {
+      restrict: 'EA',
+      templateUrl: 'templates/music.html'
+    };
+  });
+
+  // directive needs to have HTML for navigation
+  // CSS must position the navigation correctly initially
+  // directive will reposition the navigation on window size change and scroll
+  // directive will determine all anchor point names based on link
+  // names eg. a href="#resume" will scrollTo <a target="#resume">
+  // directive will determine sizes and locations of all page sections
+  // directive will do a smooth scrollTo
+  // directive will update navigation active as it passes each directive
 
 })();
