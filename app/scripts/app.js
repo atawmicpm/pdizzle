@@ -2,68 +2,80 @@
 
 	'use strict';
 
-	// require('jquery');
-	// require('../assets/js/stickymojo');
-	// require('../../bower_components/foundation/js/foundation');
+	// Gulp calls Browserify to compile these scripts into bundle.js
 	require('angular');
-	require('angular-route');
-	require('firebase');
-	require('angularfire');
-
-	var app = angular.module('pdizzle', ['ngRoute', 'firebase']);
-
-	// Routing
-	// app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
-	// 	$locationProvider.html5Mode(true);
-
-	// 	$routeProvider
-
-	// 		.when('/blog', {
-	// 			templateUrl: 'templates/blog.html',
-	// 			controller: 'BlogController'
-	// 		})
+	require('../../bower_components/ngSmoothScroll/angular-smooth-scroll');
 
 
-	// 		.otherwise({ redirectTo: '/blog' });
-	// }]);
+	// My App
+	var app = angular.module('pdizzle', ['smoothScroll']);
 
 
-	app.controller('MainController', ['$scope', '$document', '$window', function($scope, $document, $window) {
-		// $document.foundation();
-
+	// Main Controller, not being used for anything yet
+	app.controller('MainController', ['$scope', function($scope) {
+		// placeholder so gulp doesn't complain about $scope not being used
+		$scope.placeholder = '';
 
 	}]);
 
-	app.directive('navigation', function() {
+	// Navigation directive, this 
+	app.directive('navigation', ['smoothScroll', function(smoothScroll) {
 		return {
+			// why pollute parent scope?
 			scope: {},
 			restrict: 'EA',
 
 			controller: function($scope) {
-				this.items = [];
+				$scope.items = [];
 
-				this.setActive = function(elem) {
-					// remove active class from all nav items
-					angular.forEach(this.items, function(el) {
-						el.removeClass('active');
+				$scope.setActive = function(elem) {
+					// this is a double forEach since it gets called after the
+					// forEach in the link function.  This seems like it can be
+					// optimized, however, wouldn't jQuery be doing the same
+					// thing by calling $('.item').removeClass('active') ?
+					angular.forEach($scope.items, function(item) {
+						item.elem.removeClass('active');
 					});
 
 					elem.addClass('active');
 				};
 
-				this.addItem = function(elem) {
-					this.items.push(elem);
+				this.scrollTo = function(section) {
+					var section = document.getElementById(section);
+					smoothScroll(section);
 				};
 
-			},
-			
-		};
-	});
+				this.addItem = function(elem, name) {
+					var top = document.getElementById(name).offsetTop,
+							bottom = top + document.getElementById(name).offsetHeight;
 
+					$scope.items.push({
+						elem: elem,
+						top: top,
+						bottom: bottom
+					});
+				};
+			},
+
+			link: function(scope, elem, attrs) {
+				angular.element(window).bind('scroll', function() {
+					var scrollPos = window.scrollY;
+
+					angular.forEach(scope.items, function(item) {
+						if (item.top <= scrollPos && item.bottom >= scrollPos) {
+							scope.setActive(item.elem);
+						}
+					});
+				});
+			}
+		};
+	}]);
+
+	// Navigation items add themselves to navigation directive controller
 	app.directive('item', function() {
 		return {
 			scope: {},
-			restrict: 'EA',
+			restrict: 'E',
 			require: '^navigation',
 			replace: true,
 
@@ -73,12 +85,45 @@
 				scope.name = attrs.name;
 				scope.icon = attrs.icon;
 
-				navController.addItem(elem);
+				navController.addItem(elem, scope.name);
 
 				elem.bind('click', function() {
-					navController.setActive(elem);
+					navController.scrollTo(scope.name);
 				});
+
 			}
+		};
+	});
+
+	// About template
+	app.directive('about', function() {
+		return {
+			restrict: 'EA',
+			templateUrl: 'templates/about.html'
+		};
+	});
+
+	// Resume template
+	app.directive('resume', function() {
+		return {
+			restrict: 'EA',
+			templateUrl: 'templates/resume.html'
+		};
+	});
+
+	// Projects template
+	app.directive('projects', function() {
+		return {
+			restrict: 'EA',
+			templateUrl: 'templates/projects.html'
+		};
+	});
+
+	// Music template
+	app.directive('music', function() {
+		return {
+			restrict: 'EA',
+			templateUrl: 'templates/music.html'
 		};
 	});
 
@@ -90,43 +135,5 @@
 	// directive will determine sizes and locations of all page sections
 	// directive will do a smooth scrollTo
 	// directive will update navigation active as it passes each directive
-
-	// TO DO today
-	// - clean outside area
-	// - tidy above my dressers
-	// - mop hard wood
-	// - take trash down
-	// - pick up pieces of trash in driveway (newspapers)
-	// - air blow walk way and driveway
-	// - take pictures of things
-	// - 
-				
-				// var i = 0;
-
-				// function myScroll () {
-				// 	setTimeout(function() {
-				// 		window.scrollTo(i, i);
-				// 		i += 5;
-				// 		if (i < 6000) {
-				// 			myScroll();
-				// 		}
-				// 	}, 1);					
-				// }
-
-				// this.page = $location.path().substring(1);
-
-				// this.setPage = function(page) {
-				// 	this.page = page;
-				// };
-			
-				// this.isPage = function(page) {
-				// 	return this.page === page;
-				// };
-
-	// Navigation directive
-
-
-
-
 
 })();

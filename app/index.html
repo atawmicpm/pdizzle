@@ -2,47 +2,37 @@
 
 <html lang="en" ng-app="pdizzle">
 
-<head>
-	<base href="/">
-  <title>Phillip's World</title>
-  <link rel="stylesheet" type="text/css" href="css/app.css">
-  <!-- <link rel="stylesheet" type="text/css" href="css/flat-ui-pro.min.css"> -->
+	<head>
+		<base href="/">
+	  <title>Phillip's World</title>
+	  <link rel="stylesheet" type="text/css" href="css/app.css">
+	</head>
 
-</head>
-<body ng-controller="MainController">
+	<body ng-controller="MainController">
 
-	<navigation class="icon-bar large-vertical four-up">
+		<div class="container">
+	  	
+				<navigation class="icon-bar large-vertical four-up fixed">
 
-		<item name="About" icon="fa fa-buysellads"></item>
-		<item name="Resume" icon="fa fa-bed"></item>
-		<item name="Portfolio"></item>
-		<item name="Contact"></item>
-	
-	</navigation>
+					<item name="About" icon="fa fa-buysellads"></item>
+					<item name="Resume" icon="fa fa-bed"></item>
+					<item name="Projects" icon="fa fa-archive"></item>
+					<item name="Music" icon="fa fa-ship"></item>
+				
+				</navigation>
 
 
-	<div id="about">
-		<a name="about"></a>
-		<h3 data-magellan-destination="about">About</h3>
-	</div>
+				<div about id="About"></div>
 
-	<div id="resume">
-		<a name="resume"></a>
-		<h3 data-magellan-destination="resume">Resume</h3>
-	</div>
+				<div resume id="Resume"></div>
 
-	<div id="portfolio">
-		<a name="portfolio"></a>
-		<h3 data-magellan-destination="portfolio">Portfolio</h3>
-	</div>
+				<div projects id="Projects"></div>
 
-	<div id="music">
-		<a name="music"></a>
-		<h3 data-magellan-destination="music">Music</h3>
-	</div>
+				<div music id="Music"></div>
 
-  <script src="js/bundle.js"></script>
+		</div>
 
-</div>
-</body>
+	  <script src="js/bundle.js"></script>
+
+	</body>
 </html>

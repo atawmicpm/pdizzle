@@ -1,368 +1,5 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function() {
-
-	'use strict';
-
-	// Gulp calls Browserify to compile these scripts into bundle.js
-	require('angular');
-	require('../../bower_components/ngSmoothScroll/angular-smooth-scroll');
-
-
-	// My App
-	var app = angular.module('pdizzle', ['smoothScroll']);
-
-
-	// Main Controller, not being used for anything yet
-	app.controller('MainController', ['$scope', function($scope) {
-		// placeholder so gulp doesn't complain about $scope not being used
-		$scope.placeholder = '';
-
-	}]);
-
-	// Navigation directive, this 
-	app.directive('navigation', ['smoothScroll', function(smoothScroll) {
-		return {
-			// why pollute parent scope?
-			scope: {},
-			restrict: 'EA',
-
-			controller: function($scope) {
-				$scope.items = [];
-
-				$scope.setActive = function(elem) {
-					// this is a double forEach since it gets called after the
-					// forEach in the link function.  This seems like it can be
-					// optimized, however, wouldn't jQuery be doing the same
-					// thing by calling $('.item').removeClass('active') ?
-					angular.forEach($scope.items, function(item) {
-						item.elem.removeClass('active');
-					});
-
-					elem.addClass('active');
-				};
-
-				this.scrollTo = function(section) {
-					var section = document.getElementById(section);
-					smoothScroll(section);
-				};
-
-				this.addItem = function(elem, name) {
-					var top = document.getElementById(name).offsetTop,
-							bottom = top + document.getElementById(name).offsetHeight;
-
-					$scope.items.push({
-						elem: elem,
-						top: top,
-						bottom: bottom
-					});
-				};
-			},
-
-			link: function(scope, elem, attrs) {
-				angular.element(window).bind('scroll', function() {
-					var scrollPos = window.scrollY;
-
-					angular.forEach(scope.items, function(item) {
-						if (item.top <= scrollPos && item.bottom >= scrollPos) {
-							scope.setActive(item.elem);
-						}
-					});
-				});
-			}
-		};
-	}]);
-
-	// Navigation items add themselves to navigation directive controller
-	app.directive('item', function() {
-		return {
-			scope: {},
-			restrict: 'E',
-			require: '^navigation',
-			replace: true,
-
-			template: '<a class="item"><i class="{{icon}}"></i><label>{{name}}</label></a>',
-
-			link: function(scope, elem, attrs, navController) {
-				scope.name = attrs.name;
-				scope.icon = attrs.icon;
-
-				navController.addItem(elem, scope.name);
-
-				elem.bind('click', function() {
-					navController.scrollTo(scope.name);
-				});
-
-			}
-		};
-	});
-
-	// About template
-	app.directive('about', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/about.html'
-		};
-	});
-
-	// Resume template
-	app.directive('resume', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/resume.html'
-		};
-	});
-
-	// Projects template
-	app.directive('projects', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/projects.html'
-		};
-	});
-
-	// Music template
-	app.directive('music', function() {
-		return {
-			restrict: 'EA',
-			templateUrl: 'templates/music.html'
-		};
-	});
-
-	// directive needs to have HTML for navigation
-	// CSS must position the navigation correctly initially
-	// directive will reposition the navigation on window size change and scroll
-	// directive will determine all anchor point names based on link
-	// names eg. a href="#resume" will scrollTo <a target="#resume">
-	// directive will determine sizes and locations of all page sections
-	// directive will do a smooth scrollTo
-	// directive will update navigation active as it passes each directive
-
-})();
-
-},{"../../bower_components/ngSmoothScroll/angular-smooth-scroll":2,"angular":3}],2:[function(require,module,exports){
-/* =============================================================
-/*
-/*	 Angular Smooth Scroll 1.7.1
-/*	 Animates scrolling to elements, by David Oliveros.
-/*
-/*   Callback hooks contributed by Ben Armston
-/*   https://github.com/benarmston
-/*
-/*	 Easing support contributed by Willem Liu.
-/*	 https://github.com/willemliu
-/*
-/*	 Easing functions forked from Gaëtan Renaudeau.
-/*	 https://gist.github.com/gre/1650294
-/*
-/*	 Infinite loop bugs in iOS and Chrome (when zoomed) by Alex Guzman.
-/*	 https://github.com/alexguzman
-/*
-/*	 Influenced by Chris Ferdinandi
-/*	 https://github.com/cferdinandi
-/*
-/*
-/*	 Free to use under the MIT License.
-/*
-/* ============================================================= */
-
-(function () {
-	'use strict';
-
-	var module = angular.module('smoothScroll', []);
-
-
-	// Smooth scrolls the window to the provided element.
-	//
-	var smoothScroll = function (element, options) {
-		options = options || {};
-
-		// Options
-		var duration = options.duration || 800,
-			offset = options.offset || 0,
-			easing = options.easing || 'easeInOutQuart',
-			callbackBefore = options.callbackBefore || function() {},
-			callbackAfter = options.callbackAfter || function() {};
-			
-		var getScrollLocation = function() {
-			return window.pageYOffset ? window.pageYOffset : document.documentElement.scrollTop;
-		};
-
-		setTimeout( function() {
-			var startLocation = getScrollLocation(),
-				timeLapsed = 0,
-				percentage, position;
-
-			// Calculate the easing pattern
-			var easingPattern = function (type, time) {
-				if ( type == 'easeInQuad' ) return time * time; // accelerating from zero velocity
-				if ( type == 'easeOutQuad' ) return time * (2 - time); // decelerating to zero velocity
-				if ( type == 'easeInOutQuad' ) return time < 0.5 ? 2 * time * time : -1 + (4 - 2 * time) * time; // acceleration until halfway, then deceleration
-				if ( type == 'easeInCubic' ) return time * time * time; // accelerating from zero velocity
-				if ( type == 'easeOutCubic' ) return (--time) * time * time + 1; // decelerating to zero velocity
-				if ( type == 'easeInOutCubic' ) return time < 0.5 ? 4 * time * time * time : (time - 1) * (2 * time - 2) * (2 * time - 2) + 1; // acceleration until halfway, then deceleration
-				if ( type == 'easeInQuart' ) return time * time * time * time; // accelerating from zero velocity
-				if ( type == 'easeOutQuart' ) return 1 - (--time) * time * time * time; // decelerating to zero velocity
-				if ( type == 'easeInOutQuart' ) return time < 0.5 ? 8 * time * time * time * time : 1 - 8 * (--time) * time * time * time; // acceleration until halfway, then deceleration
-				if ( type == 'easeInQuint' ) return time * time * time * time * time; // accelerating from zero velocity
-				if ( type == 'easeOutQuint' ) return 1 + (--time) * time * time * time * time; // decelerating to zero velocity
-				if ( type == 'easeInOutQuint' ) return time < 0.5 ? 16 * time * time * time * time * time : 1 + 16 * (--time) * time * time * time * time; // acceleration until halfway, then deceleration
-				return time; // no easing, no acceleration
-			};
-
-
-			// Calculate how far to scroll
-			var getEndLocation = function (element) {
-				var location = 0;
-				if (element.offsetParent) {
-					do {
-						location += element.offsetTop;
-						element = element.offsetParent;
-					} while (element);
-				}
-				location = Math.max(location - offset, 0);
-				return location;
-			};
-
-			var endLocation = getEndLocation(element);
-			var distance = endLocation - startLocation;
-
-
-			// Stop the scrolling animation when the anchor is reached (or at the top/bottom of the page)
-			var stopAnimation = function () {
-				var currentLocation = getScrollLocation();
-				if ( position == endLocation || currentLocation == endLocation || ( (window.innerHeight + currentLocation) >= document.body.scrollHeight ) ) {
-					clearInterval(runAnimation);
-					callbackAfter(element);
-				}
-			};
-
-
-			// Scroll the page by an increment, and check if it's time to stop
-			var animateScroll = function () {
-				timeLapsed += 16;
-				percentage = ( timeLapsed / duration );
-				percentage = ( percentage > 1 ) ? 1 : percentage;
-				position = startLocation + ( distance * easingPattern(easing, percentage) );
-				window.scrollTo( 0, position );
-				stopAnimation();
-			};
-
-
-			// Init
-			callbackBefore(element);
-			var runAnimation = setInterval(animateScroll, 16);
-		}, 0);
-	};
-
-
-	// Expose the library in a factory
-	//
-	module.factory('smoothScroll', function() {
-		return smoothScroll;
-	});
-	
-
-	// Scrolls the window to this element, optionally validating an expression
-	//
-	module.directive('smoothScroll', ['smoothScroll', function(smoothScroll) {
-		return {
-			restrict: 'A',
-			scope: {
-				callbackBefore: '&',
-				callbackAfter: '&',
-			},
-			link: function($scope, $elem, $attrs) {
-				if ( typeof $attrs.scrollIf === 'undefined' || $attrs.scrollIf === 'true' ) {
-					setTimeout( function() {
-
-						var callbackBefore = function(element) {
-							if ( $attrs.callbackBefore ) {
-								var exprHandler = $scope.callbackBefore({ element: element });
-								if (typeof exprHandler === 'function') {
-									exprHandler(element);
-								}
-							}
-						};
-
-						var callbackAfter = function(element) {
-							if ( $attrs.callbackAfter ) {
-								var exprHandler = $scope.callbackAfter({ element: element });
-								if (typeof exprHandler === 'function') {
-									exprHandler(element);
-								}
-							}
-						};
-
-						smoothScroll($elem[0], {
-							duration: $attrs.duration,
-							offset: $attrs.offset,
-							easing: $attrs.easing,
-							callbackBefore: callbackBefore,
-							callbackAfter: callbackAfter
-						});
-					}, 0);
-				}
-			}
-		};
-	}]);
-
-
-	// Scrolls to a specified element ID when this element is clicked
-	//
-	module.directive('scrollTo', ['smoothScroll', function(smoothScroll) {
-		return {
-			restrict: 'A',
-			scope: {
-				callbackBefore: '&',
-				callbackAfter: '&',
-			},
-			link: function($scope, $elem, $attrs) {
-				var targetElement;
-				
-				$elem.on('click', function(e) {
-					e.preventDefault();
-
-					targetElement = document.getElementById($attrs.scrollTo);
-					if ( !targetElement ) return; 
-					
-					var callbackBefore = function(element) {
-						if ( $attrs.callbackBefore ) {
-							var exprHandler = $scope.callbackBefore({element: element});
-							if (typeof exprHandler === 'function') {
-								exprHandler(element);
-							}
-						}
-					};
-
-					var callbackAfter = function(element) {
-						if ( $attrs.callbackAfter ) {
-							var exprHandler = $scope.callbackAfter({element: element});
-							if (typeof exprHandler === 'function') {
-								exprHandler(element);
-							}
-						}
-					};
-
-					smoothScroll(targetElement, {
-						duration: $attrs.duration,
-						offset: $attrs.offset,
-						easing: $attrs.easing,
-						callbackBefore: callbackBefore,
-						callbackAfter: callbackAfter
-					});
-
-					return false;
-				});
-			}
-		};
-	}]);
-
-}());
-},{}],3:[function(require,module,exports){
-(function (global){
-;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /**
- * @license AngularJS v1.3.10
+ * @license AngularJS v1.3.11
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -417,7 +54,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message = message + '\nhttp://errors.angularjs.org/1.3.10/' +
+    message = message + '\nhttp://errors.angularjs.org/1.3.11/' +
       (module ? module + '/' : '') + code;
     for (i = 2; i < arguments.length; i++) {
       message = message + (i == 2 ? '?' : '&') + 'p' + (i - 2) + '=' +
@@ -2481,11 +2118,11 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.3.10',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.3.11',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 3,
-  dot: 10,
-  codeName: 'heliotropic-sundial'
+  dot: 11,
+  codeName: 'spiffy-manatee'
 };
 
 
@@ -11683,7 +11320,7 @@ function $LocationProvider() {
       // TODO(vojta): rewrite link when opening in new tab/window (in legacy browser)
       // currently we open nice url link and redirect then
 
-      if (!html5Mode.rewriteLinks || event.ctrlKey || event.metaKey || event.which == 2) return;
+      if (!html5Mode.rewriteLinks || event.ctrlKey || event.metaKey || event.shiftKey || event.which == 2 || event.button == 2) return;
 
       var elm = jqLite(event.target);
 
@@ -18028,6 +17665,9 @@ var htmlAnchorDirective = valueFn({
   compile: function(element, attr) {
     if (!attr.href && !attr.xlinkHref && !attr.name) {
       return function(scope, element) {
+        // If the linked element is not an anchor tag anymore, do nothing
+        if (element[0].nodeName.toLowerCase() !== 'a') return;
+
         // SVGAElement does not use the href attribute, but rather the 'xlinkHref' attribute.
         var href = toString.call(element.prop('href')) === '[object SVGAnimatedString]' ?
                    'xlink:href' : 'href';
@@ -19046,19 +18686,21 @@ var inputType = {
          <script>
            angular.module('textInputExample', [])
              .controller('ExampleController', ['$scope', function($scope) {
-               $scope.text = 'guest';
-               $scope.word = /^\s*\w*\s*$/;
+               $scope.example = {
+                 text: 'guest',
+                 word: /^\s*\w*\s*$/
+               };
              }]);
          </script>
          <form name="myForm" ng-controller="ExampleController">
-           Single word: <input type="text" name="input" ng-model="text"
-                               ng-pattern="word" required ng-trim="false">
+           Single word: <input type="text" name="input" ng-model="example.text"
+                               ng-pattern="example.word" required ng-trim="false">
            <span class="error" ng-show="myForm.input.$error.required">
              Required!</span>
            <span class="error" ng-show="myForm.input.$error.pattern">
              Single word only!</span>
 
-           <tt>text = {{text}}</tt><br/>
+           <tt>text = {{example.text}}</tt><br/>
            <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
            <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
            <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19066,9 +18708,9 @@ var inputType = {
           </form>
         </file>
         <file name="protractor.js" type="protractor">
-          var text = element(by.binding('text'));
+          var text = element(by.binding('example.text'));
           var valid = element(by.binding('myForm.input.$valid'));
-          var input = element(by.model('text'));
+          var input = element(by.model('example.text'));
 
           it('should initialize to model', function() {
             expect(text.getText()).toContain('guest');
@@ -19130,18 +18772,20 @@ var inputType = {
        <script>
           angular.module('dateInputExample', [])
             .controller('DateController', ['$scope', function($scope) {
-              $scope.value = new Date(2013, 9, 22);
+              $scope.example = {
+                value: new Date(2013, 9, 22)
+              };
             }]);
        </script>
        <form name="myForm" ng-controller="DateController as dateCtrl">
           Pick a date in 2013:
-          <input type="date" id="exampleInput" name="input" ng-model="value"
+          <input type="date" id="exampleInput" name="input" ng-model="example.value"
               placeholder="yyyy-MM-dd" min="2013-01-01" max="2013-12-31" required />
           <span class="error" ng-show="myForm.input.$error.required">
               Required!</span>
           <span class="error" ng-show="myForm.input.$error.date">
               Not a valid date!</span>
-           <tt>value = {{value | date: "yyyy-MM-dd"}}</tt><br/>
+           <tt>value = {{example.value | date: "yyyy-MM-dd"}}</tt><br/>
            <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
            <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
            <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19149,9 +18793,9 @@ var inputType = {
        </form>
      </file>
      <file name="protractor.js" type="protractor">
-        var value = element(by.binding('value | date: "yyyy-MM-dd"'));
+        var value = element(by.binding('example.value | date: "yyyy-MM-dd"'));
         var valid = element(by.binding('myForm.input.$valid'));
-        var input = element(by.model('value'));
+        var input = element(by.model('example.value'));
 
         // currently protractor/webdriver does not support
         // sending keys to all known HTML5 input controls
@@ -19221,18 +18865,20 @@ var inputType = {
       <script>
         angular.module('dateExample', [])
           .controller('DateController', ['$scope', function($scope) {
-            $scope.value = new Date(2010, 11, 28, 14, 57);
+            $scope.example = {
+              value: new Date(2010, 11, 28, 14, 57)
+            };
           }]);
       </script>
       <form name="myForm" ng-controller="DateController as dateCtrl">
         Pick a date between in 2013:
-        <input type="datetime-local" id="exampleInput" name="input" ng-model="value"
+        <input type="datetime-local" id="exampleInput" name="input" ng-model="example.value"
             placeholder="yyyy-MM-ddTHH:mm:ss" min="2001-01-01T00:00:00" max="2013-12-31T00:00:00" required />
         <span class="error" ng-show="myForm.input.$error.required">
             Required!</span>
         <span class="error" ng-show="myForm.input.$error.datetimelocal">
             Not a valid date!</span>
-        <tt>value = {{value | date: "yyyy-MM-ddTHH:mm:ss"}}</tt><br/>
+        <tt>value = {{example.value | date: "yyyy-MM-ddTHH:mm:ss"}}</tt><br/>
         <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
         <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
         <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19240,9 +18886,9 @@ var inputType = {
       </form>
     </file>
     <file name="protractor.js" type="protractor">
-      var value = element(by.binding('value | date: "yyyy-MM-ddTHH:mm:ss"'));
+      var value = element(by.binding('example.value | date: "yyyy-MM-ddTHH:mm:ss"'));
       var valid = element(by.binding('myForm.input.$valid'));
-      var input = element(by.model('value'));
+      var input = element(by.model('example.value'));
 
       // currently protractor/webdriver does not support
       // sending keys to all known HTML5 input controls
@@ -19313,18 +18959,20 @@ var inputType = {
      <script>
       angular.module('timeExample', [])
         .controller('DateController', ['$scope', function($scope) {
-          $scope.value = new Date(1970, 0, 1, 14, 57, 0);
+          $scope.example = {
+            value: new Date(1970, 0, 1, 14, 57, 0)
+          };
         }]);
      </script>
      <form name="myForm" ng-controller="DateController as dateCtrl">
         Pick a between 8am and 5pm:
-        <input type="time" id="exampleInput" name="input" ng-model="value"
+        <input type="time" id="exampleInput" name="input" ng-model="example.value"
             placeholder="HH:mm:ss" min="08:00:00" max="17:00:00" required />
         <span class="error" ng-show="myForm.input.$error.required">
             Required!</span>
         <span class="error" ng-show="myForm.input.$error.time">
             Not a valid date!</span>
-        <tt>value = {{value | date: "HH:mm:ss"}}</tt><br/>
+        <tt>value = {{example.value | date: "HH:mm:ss"}}</tt><br/>
         <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
         <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
         <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19332,9 +18980,9 @@ var inputType = {
      </form>
    </file>
    <file name="protractor.js" type="protractor">
-      var value = element(by.binding('value | date: "HH:mm:ss"'));
+      var value = element(by.binding('example.value | date: "HH:mm:ss"'));
       var valid = element(by.binding('myForm.input.$valid'));
-      var input = element(by.model('value'));
+      var input = element(by.model('example.value'));
 
       // currently protractor/webdriver does not support
       // sending keys to all known HTML5 input controls
@@ -19404,18 +19052,20 @@ var inputType = {
       <script>
       angular.module('weekExample', [])
         .controller('DateController', ['$scope', function($scope) {
-          $scope.value = new Date(2013, 0, 3);
+          $scope.example = {
+            value: new Date(2013, 0, 3)
+          };
         }]);
       </script>
       <form name="myForm" ng-controller="DateController as dateCtrl">
         Pick a date between in 2013:
-        <input id="exampleInput" type="week" name="input" ng-model="value"
+        <input id="exampleInput" type="week" name="input" ng-model="example.value"
             placeholder="YYYY-W##" min="2012-W32" max="2013-W52" required />
         <span class="error" ng-show="myForm.input.$error.required">
             Required!</span>
         <span class="error" ng-show="myForm.input.$error.week">
             Not a valid date!</span>
-        <tt>value = {{value | date: "yyyy-Www"}}</tt><br/>
+        <tt>value = {{example.value | date: "yyyy-Www"}}</tt><br/>
         <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
         <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
         <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19423,9 +19073,9 @@ var inputType = {
       </form>
     </file>
     <file name="protractor.js" type="protractor">
-      var value = element(by.binding('value | date: "yyyy-Www"'));
+      var value = element(by.binding('example.value | date: "yyyy-Www"'));
       var valid = element(by.binding('myForm.input.$valid'));
-      var input = element(by.model('value'));
+      var input = element(by.model('example.value'));
 
       // currently protractor/webdriver does not support
       // sending keys to all known HTML5 input controls
@@ -19495,18 +19145,20 @@ var inputType = {
      <script>
       angular.module('monthExample', [])
         .controller('DateController', ['$scope', function($scope) {
-          $scope.value = new Date(2013, 9, 1);
+          $scope.example = {
+            value: new Date(2013, 9, 1)
+          };
         }]);
      </script>
      <form name="myForm" ng-controller="DateController as dateCtrl">
-       Pick a month int 2013:
-       <input id="exampleInput" type="month" name="input" ng-model="value"
+       Pick a month in 2013:
+       <input id="exampleInput" type="month" name="input" ng-model="example.value"
           placeholder="yyyy-MM" min="2013-01" max="2013-12" required />
        <span class="error" ng-show="myForm.input.$error.required">
           Required!</span>
        <span class="error" ng-show="myForm.input.$error.month">
           Not a valid month!</span>
-       <tt>value = {{value | date: "yyyy-MM"}}</tt><br/>
+       <tt>value = {{example.value | date: "yyyy-MM"}}</tt><br/>
        <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
        <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
        <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19514,9 +19166,9 @@ var inputType = {
      </form>
    </file>
    <file name="protractor.js" type="protractor">
-      var value = element(by.binding('value | date: "yyyy-MM"'));
+      var value = element(by.binding('example.value | date: "yyyy-MM"'));
       var valid = element(by.binding('myForm.input.$valid'));
-      var input = element(by.model('value'));
+      var input = element(by.model('example.value'));
 
       // currently protractor/webdriver does not support
       // sending keys to all known HTML5 input controls
@@ -19592,17 +19244,19 @@ var inputType = {
          <script>
            angular.module('numberExample', [])
              .controller('ExampleController', ['$scope', function($scope) {
-               $scope.value = 12;
+               $scope.example = {
+                 value: 12
+               };
              }]);
          </script>
          <form name="myForm" ng-controller="ExampleController">
-           Number: <input type="number" name="input" ng-model="value"
+           Number: <input type="number" name="input" ng-model="example.value"
                           min="0" max="99" required>
            <span class="error" ng-show="myForm.input.$error.required">
              Required!</span>
            <span class="error" ng-show="myForm.input.$error.number">
              Not valid number!</span>
-           <tt>value = {{value}}</tt><br/>
+           <tt>value = {{example.value}}</tt><br/>
            <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
            <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
            <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19610,9 +19264,9 @@ var inputType = {
           </form>
         </file>
         <file name="protractor.js" type="protractor">
-          var value = element(by.binding('value'));
+          var value = element(by.binding('example.value'));
           var valid = element(by.binding('myForm.input.$valid'));
-          var input = element(by.model('value'));
+          var input = element(by.model('example.value'));
 
           it('should initialize to model', function() {
             expect(value.getText()).toContain('12');
@@ -19680,16 +19334,18 @@ var inputType = {
          <script>
            angular.module('urlExample', [])
              .controller('ExampleController', ['$scope', function($scope) {
-               $scope.text = 'http://google.com';
+               $scope.url = {
+                 text: 'http://google.com'
+               };
              }]);
          </script>
          <form name="myForm" ng-controller="ExampleController">
-           URL: <input type="url" name="input" ng-model="text" required>
+           URL: <input type="url" name="input" ng-model="url.text" required>
            <span class="error" ng-show="myForm.input.$error.required">
              Required!</span>
            <span class="error" ng-show="myForm.input.$error.url">
              Not valid url!</span>
-           <tt>text = {{text}}</tt><br/>
+           <tt>text = {{url.text}}</tt><br/>
            <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
            <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
            <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19698,9 +19354,9 @@ var inputType = {
           </form>
         </file>
         <file name="protractor.js" type="protractor">
-          var text = element(by.binding('text'));
+          var text = element(by.binding('url.text'));
           var valid = element(by.binding('myForm.input.$valid'));
-          var input = element(by.model('text'));
+          var input = element(by.model('url.text'));
 
           it('should initialize to model', function() {
             expect(text.getText()).toContain('http://google.com');
@@ -19769,16 +19425,18 @@ var inputType = {
          <script>
            angular.module('emailExample', [])
              .controller('ExampleController', ['$scope', function($scope) {
-               $scope.text = 'me@example.com';
+               $scope.email = {
+                 text: 'me@example.com'
+               };
              }]);
          </script>
            <form name="myForm" ng-controller="ExampleController">
-             Email: <input type="email" name="input" ng-model="text" required>
+             Email: <input type="email" name="input" ng-model="email.text" required>
              <span class="error" ng-show="myForm.input.$error.required">
                Required!</span>
              <span class="error" ng-show="myForm.input.$error.email">
                Not valid email!</span>
-             <tt>text = {{text}}</tt><br/>
+             <tt>text = {{email.text}}</tt><br/>
              <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br/>
              <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br/>
              <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -19787,9 +19445,9 @@ var inputType = {
            </form>
          </file>
         <file name="protractor.js" type="protractor">
-          var text = element(by.binding('text'));
+          var text = element(by.binding('email.text'));
           var valid = element(by.binding('myForm.input.$valid'));
-          var input = element(by.model('text'));
+          var input = element(by.model('email.text'));
 
           it('should initialize to model', function() {
             expect(text.getText()).toContain('me@example.com');
@@ -19836,7 +19494,9 @@ var inputType = {
          <script>
            angular.module('radioExample', [])
              .controller('ExampleController', ['$scope', function($scope) {
-               $scope.color = 'blue';
+               $scope.color = {
+                 name: 'blue'
+               };
                $scope.specialValue = {
                  "id": "12345",
                  "value": "green"
@@ -19844,20 +19504,20 @@ var inputType = {
              }]);
          </script>
          <form name="myForm" ng-controller="ExampleController">
-           <input type="radio" ng-model="color" value="red">  Red <br/>
-           <input type="radio" ng-model="color" ng-value="specialValue"> Green <br/>
-           <input type="radio" ng-model="color" value="blue"> Blue <br/>
-           <tt>color = {{color | json}}</tt><br/>
+           <input type="radio" ng-model="color.name" value="red">  Red <br/>
+           <input type="radio" ng-model="color.name" ng-value="specialValue"> Green <br/>
+           <input type="radio" ng-model="color.name" value="blue"> Blue <br/>
+           <tt>color = {{color.name | json}}</tt><br/>
           </form>
           Note that `ng-value="specialValue"` sets radio item's value to be the value of `$scope.specialValue`.
         </file>
         <file name="protractor.js" type="protractor">
           it('should change state', function() {
-            var color = element(by.binding('color'));
+            var color = element(by.binding('color.name'));
 
             expect(color.getText()).toContain('blue');
 
-            element.all(by.model('color')).get(0).click();
+            element.all(by.model('color.name')).get(0).click();
 
             expect(color.getText()).toContain('red');
           });
@@ -19887,28 +19547,30 @@ var inputType = {
          <script>
            angular.module('checkboxExample', [])
              .controller('ExampleController', ['$scope', function($scope) {
-               $scope.value1 = true;
-               $scope.value2 = 'YES'
+               $scope.checkboxModel = {
+                value1 : true,
+                value2 : 'YES'
+              };
              }]);
          </script>
          <form name="myForm" ng-controller="ExampleController">
-           Value1: <input type="checkbox" ng-model="value1"> <br/>
-           Value2: <input type="checkbox" ng-model="value2"
+           Value1: <input type="checkbox" ng-model="checkboxModel.value1"> <br/>
+           Value2: <input type="checkbox" ng-model="checkboxModel.value2"
                           ng-true-value="'YES'" ng-false-value="'NO'"> <br/>
-           <tt>value1 = {{value1}}</tt><br/>
-           <tt>value2 = {{value2}}</tt><br/>
+           <tt>value1 = {{checkboxModel.value1}}</tt><br/>
+           <tt>value2 = {{checkboxModel.value2}}</tt><br/>
           </form>
         </file>
         <file name="protractor.js" type="protractor">
           it('should change state', function() {
-            var value1 = element(by.binding('value1'));
-            var value2 = element(by.binding('value2'));
+            var value1 = element(by.binding('checkboxModel.value1'));
+            var value2 = element(by.binding('checkboxModel.value2'));
 
             expect(value1.getText()).toContain('true');
             expect(value2.getText()).toContain('YES');
 
-            element(by.model('value1')).click();
-            element(by.model('value2')).click();
+            element(by.model('checkboxModel.value1')).click();
+            element(by.model('checkboxModel.value2')).click();
 
             expect(value1.getText()).toContain('false');
             expect(value2.getText()).toContain('NO');
@@ -22617,7 +22279,7 @@ var ngIncludeFillContentDirective = ['$compile',
  * **Note**: If you have assignment in `ngInit` along with {@link ng.$filter `$filter`}, make
  * sure you have parenthesis for correct precedence:
  * <pre class="prettyprint">
- *   <div ng-init="test1 = (data | orderBy:'name')"></div>
+ * `<div ng-init="test1 = (data | orderBy:'name')"></div>`
  * </pre>
  * </div>
  *
@@ -26452,9 +26114,3 @@ var minlengthDirective = function() {
 })(window, document);
 
 !window.angular.$$csp() && window.angular.element(document).find('head').prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}</style>');
-; browserify_shim__define__module__export__(typeof angular != "undefined" ? angular : window.angular);
-
-}).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[1]);
