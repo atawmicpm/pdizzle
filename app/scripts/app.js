@@ -14,7 +14,7 @@
   // Main Controller, not being used for anything yet
   app.controller('MainController', ['$scope', function($scope) {
     // placeholder so gulp doesn't complain about $scope not being used
-    $scope.placeholder = '';
+    $scope.placeholder = 'Here for Jasmine!';
 
   }]);
 
