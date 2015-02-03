@@ -57,16 +57,13 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('test', ['watch'], function() {
+// KARMA / JASMINE
+gulp.task('test', function() {
   return gulp.src('./fakefile')
     .pipe(karma({
       configFile: 'karma.conf.js',
       action: 'run'
-    }))
-    .on('error', function(err) {
-      console.log(err);
-      this.emit('end');
-    });
+    }));
 });
 
 // browserify to resolve front end dependencies

@@ -15,10 +15,10 @@
   // Main Controller, not being used for anything yet
   app.controller('MainController', ['$scope', function($scope) {
     // placeholder so gulp doesn't complain about $scope not being used
-    $scope.placeholder = 'Here for Jasmine!';
-
+    $scope.placeholder = 'Here for Jasmine';
+    $scope.tester = 'Second Test!';
   }]);
- 
+
   // Navigation directive, this 
   app.directive('navigation', ['smoothScroll', function(smoothScroll) {
     return {

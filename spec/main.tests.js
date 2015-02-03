@@ -14,5 +14,9 @@ describe('MainController', function() {
   it('should have $scope.placeholder text be Here for Jasmine!', function() {
     expect(scope.placeholder).toBe('Here for Jasmine!');
   });
-  
+
+  it('should have $scope.tester = Second Test!', function() {
+    expect(scope.tester).toBe('Second Test!');
+  });
+
 });
