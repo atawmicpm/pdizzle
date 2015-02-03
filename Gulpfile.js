@@ -6,7 +6,8 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     clean = require('gulp-clean'),
     sass = require('gulp-sass'),
-    autoprefixer = require('gulp-autoprefixer');
+    autoprefixer = require('gulp-autoprefixer'),
+    karma = require('gulp-karma');
 
 // default task
 gulp.task('default', ['clean', 'browserify', 'views', 'styles', 'dev']);
@@ -25,6 +26,11 @@ gulp.task('watch', ['lint'], function() {
   gulp.watch(['app/styles/*.scss'], [
     'styles'
   ]);
+
+  gulp.watch(['dist/js/bundle.js'], [
+    'test'
+  ]);
+
 });
 
 gulp.task('clean', function() {
@@ -48,8 +54,19 @@ gulp.task('clean', function() {
 gulp.task('lint', function() {
   gulp.src('./app/scripts/*.js')
     .pipe(jshint())   
-
     .pipe(jshint.reporter('default'));
+});
+
+gulp.task('test', ['watch'], function() {
+  return gulp.src('./fakefile')
+    .pipe(karma({
+      configFile: 'karma.conf.js',
+      action: 'run'
+    }))
+    .on('error', function(err) {
+      console.log(err);
+      this.emit('end');
+    });
 });
 
 // browserify to resolve front end dependencies

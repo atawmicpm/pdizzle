@@ -3,21 +3,22 @@
   'use strict';
 
   // Gulp calls Browserify to compile these scripts into bundle.js
-  require('angular');
+  var angular = require('angular'); // defining angular so i can keep undefined: true in jshint
+  
   require('../../bower_components/ngSmoothScroll/angular-smooth-scroll');
 
 
   // My App
   var app = angular.module('pdizzle', ['smoothScroll']);
 
-
+ 
   // Main Controller, not being used for anything yet
   app.controller('MainController', ['$scope', function($scope) {
     // placeholder so gulp doesn't complain about $scope not being used
     $scope.placeholder = 'Here for Jasmine!';
 
   }]);
-
+ 
   // Navigation directive, this 
   app.directive('navigation', ['smoothScroll', function(smoothScroll) {
     return {
@@ -41,7 +42,7 @@
         };
 
         this.scrollTo = function(section) {
-          var section = document.getElementById(section);
+          section = document.getElementById(section);
           smoothScroll(section);
         };
 
