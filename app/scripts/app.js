@@ -15,7 +15,7 @@
   // Main Controller, not being used for anything yet
   app.controller('MainController', ['$scope', function($scope) {
     // placeholder so gulp doesn't complain about $scope not being used
-    $scope.placeholder = 'Here for Jasmine';
+    $scope.placeholder = 'Here for Jasmine!';
     $scope.tester = 'Second Test!';
   }]);
 
@@ -127,7 +127,7 @@
       templateUrl: 'templates/music.html'
     };
   });
-
+ 
   // directive needs to have HTML for navigation
   // CSS must position the navigation correctly initially
   // directive will reposition the navigation on window size change and scroll

@@ -10,10 +10,10 @@ var gulp = require('gulp'),
     karma = require('gulp-karma');
 
 // default task
-gulp.task('default', ['clean', 'browserify', 'views', 'styles', 'dev']);
+gulp.task('default', ['clean', 'browserify', 'views', 'styles', 'dev', 'watch']);
 
 // watch files for changes and rebundle and lint
-gulp.task('watch', ['lint'], function() {
+gulp.task('watch', ['lint', 'dev'], function() {
   gulp.watch(['app/scripts/*.js', 'app/scripts/**/*.js'],[
     'lint',
     'browserify'
@@ -101,7 +101,7 @@ gulp.task('styles', function() {
     .pipe(gulp.dest('dist/fonts/'));
 });
 
-gulp.task('dev', function() {
+gulp.task('dev', ['browserify'], function() {
 
   // start webserver
   server.listen(serverport);
@@ -110,7 +110,7 @@ gulp.task('dev', function() {
   lrserver.listen(livereloadport);
 
   // watch for any file changes
-  gulp.run('watch');
+  // gulp.run('watch');
 });
 
 // EXPRESS WEBSERVER for local dev
