@@ -44,7 +44,8 @@
         this.scrollTo = function(section) {
           section = document.getElementById(section);
           smoothScroll(section, {
-            duration: 400
+            duration: 400,
+            offset: 120
           });
         };
 
@@ -62,7 +63,7 @@
 
       link: function(scope, elem, attrs) {
         angular.element(window).bind('scroll', function() {
-          var scrollPos = window.scrollY;
+          var scrollPos = window.scrollY + 80;
 
           angular.forEach(scope.items, function(item) {
             if (item.top <= scrollPos && item.bottom >= scrollPos) {
