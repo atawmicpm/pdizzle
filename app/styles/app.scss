@@ -1,5 +1,48 @@
-@import '_foundation';
+// @import '_foundation';
 @import 'font-awesome/scss/font-awesome';
+
+$softgreen: rgba(94,255,153, 1);
+$darkgreen: rgba(48,178,96, 1);
+$purple: rgba(167,64,255, 1);
+$lightpurple: rgba(167,64,255, 0.8);
+$tan: rgba(204,146,55, 1);
+$brown: rgba(178,131,57, 1); 
+
+$font-family: 'Lato', sans-serif;
+
+
+body {
+  font-family: $font-family;
+}
+
+.icon-bar {
+  width: 200px;
+  position: fixed;
+  top: 200px;
+  right: 200px;
+
+	.item {
+    width: 125px;
+    height: 100px;
+    line-height: 100px;
+    border-radius: 5px;
+    margin: 5px;
+    text-align: center;
+    float: left;
+    background-color: $purple;
+    color: white;
+    cursor: pointer;
+    &:hover {
+      background-color: $lightpurple;
+    }
+    &.active {
+      background-color: $darkgreen;
+    }
+    label {
+      cursor: pointer;
+    }
+	}
+}
 
 #About {
   background-color: blue;

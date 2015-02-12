@@ -79,7 +79,7 @@
       require: '^navigation',
       replace: true,
 
-      template: '<a class="item"><i class="{{icon}}"></i><label>{{name}}</label></a>',
+      template: '<a class="item"><i class=""></i><label>{{name}}</label></a>',
 
       link: function(scope, elem, attrs, navController) {
         scope.name = attrs.name;
