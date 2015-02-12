@@ -6,13 +6,14 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     clean = require('gulp-clean'),
     sass = require('gulp-sass'),
-    autoprefixer = require('gulp-autoprefixer');
+    autoprefixer = require('gulp-autoprefixer'),
+    karma = require('gulp-karma');
 
 // default task
-gulp.task('default', ['clean', 'browserify', 'views', 'styles', 'dev']);
+gulp.task('default', ['clean', 'browserify', 'views', 'styles', 'dev', 'watch']);
 
 // watch files for changes and rebundle and lint
-gulp.task('watch', ['lint'], function() {
+gulp.task('watch', ['lint', 'dev'], function() {
   gulp.watch(['app/scripts/*.js', 'app/scripts/**/*.js'],[
     'lint',
     'browserify'
@@ -25,6 +26,11 @@ gulp.task('watch', ['lint'], function() {
   gulp.watch(['app/styles/*.scss'], [
     'styles'
   ]);
+
+  gulp.watch(['dist/js/bundle.js'], [
+    'test'
+  ]);
+
 });
 
 gulp.task('clean', function() {
@@ -48,8 +54,16 @@ gulp.task('clean', function() {
 gulp.task('lint', function() {
   gulp.src('./app/scripts/*.js')
     .pipe(jshint())   
-
     .pipe(jshint.reporter('default'));
+});
+
+// KARMA / JASMINE
+gulp.task('test', function() {
+  return gulp.src('./fakefile')
+    .pipe(karma({
+      configFile: 'karma.conf.js',
+      action: 'run'
+    }));
 });
 
 // browserify to resolve front end dependencies
@@ -87,7 +101,7 @@ gulp.task('styles', function() {
     .pipe(gulp.dest('dist/fonts/'));
 });
 
-gulp.task('dev', function() {
+gulp.task('dev', ['browserify'], function() {
 
   // start webserver
   server.listen(serverport);
@@ -96,7 +110,7 @@ gulp.task('dev', function() {
   lrserver.listen(livereloadport);
 
   // watch for any file changes
-  gulp.run('watch');
+  // gulp.run('watch');
 });
 
 // EXPRESS WEBSERVER for local dev

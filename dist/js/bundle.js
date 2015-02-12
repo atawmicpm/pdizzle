@@ -4,19 +4,20 @@
   'use strict';
 
   // Gulp calls Browserify to compile these scripts into bundle.js
-  require('angular');
+  var angular = require('angular'); // defining angular so i can keep undefined: true in jshint
+  
   require('../../bower_components/ngSmoothScroll/angular-smooth-scroll');
 
 
   // My App
   var app = angular.module('pdizzle', ['smoothScroll']);
 
-
+ 
   // Main Controller, not being used for anything yet
   app.controller('MainController', ['$scope', function($scope) {
     // placeholder so gulp doesn't complain about $scope not being used
-    $scope.placeholder = '';
-
+    $scope.placeholder = 'Here for Jasmine!';
+    $scope.tester = 'Second Test!';
   }]);
 
   // Navigation directive, this 
@@ -42,7 +43,7 @@
         };
 
         this.scrollTo = function(section) {
-          var section = document.getElementById(section);
+          section = document.getElementById(section);
           smoothScroll(section);
         };
 
@@ -127,7 +128,7 @@
       templateUrl: 'templates/music.html'
     };
   });
-
+ 
   // directive needs to have HTML for navigation
   // CSS must position the navigation correctly initially
   // directive will reposition the navigation on window size change and scroll
