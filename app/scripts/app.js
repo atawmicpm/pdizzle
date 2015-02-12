@@ -43,7 +43,9 @@
 
         this.scrollTo = function(section) {
           section = document.getElementById(section);
-          smoothScroll(section);
+          smoothScroll(section, {
+            duration: 400
+          });
         };
 
         this.addItem = function(elem, name) {
