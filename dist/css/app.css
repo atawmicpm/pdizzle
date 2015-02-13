@@ -1719,19 +1719,28 @@
   content: "\f23a"; }
 
 body {
-  font-family: 'Lato', sans-serif;
-  background-color: rgba(108, 204, 55, 0.3); }
+  font-family: 'Lato', sans-serif; }
+
+.profile-image {
+  min-width: 200px;
+  max-width: 20%;
+  float: left; }
+
+.profile {
+  width: 50%;
+  display: block;
+  margin: 0 auto;
+  padding-top: 100px; }
 
 .icon-bar {
   width: 125px;
   position: fixed;
   top: 200px;
-  right: 0px; }
+  right: 30px; }
   .icon-bar .item {
     width: 100%;
     height: 100px;
     line-height: 100px;
-    border-radius: 5px;
     margin: 5px;
     text-align: center;
     float: left;
@@ -1739,34 +1748,39 @@ body {
     background-color: #5e6dff;
     color: white;
     cursor: pointer;
-    box-sizing: border-box; }
+    box-sizing: border-box;
+    -webkit-transition: background-color 0.3s;
+            transition: background-color 0.3s; }
     .icon-bar .item:hover {
       background-color: #6ccc37; }
     .icon-bar .item.active {
       background-color: #ff6324; }
     .icon-bar .item label {
       cursor: pointer; }
-  @media screen and (max-width: 414px) {
+  @media screen and (min-width: 1440px) {
+    .icon-bar {
+      width: 200px; }
+      .icon-bar .item {
+        height: 150px;
+        line-height: 150px; } }
+  @media screen and (max-width: 800px) {
     .icon-bar {
       width: 100%;
-      top: 0px;
+      top: auto;
+      bottom: 0px;
       left: 0px; }
       .icon-bar .item {
         width: 25%;
-        border-radius: 0px;
         margin: 0px;
         border-right: 1px solid white; }
         .icon-bar .item:nth-last-child(1) {
           border-right: 0px; } }
 
 .container {
-  background-color: pink;
   margin-top: 0px;
-  margin-right: 120px;
-  padding: 10px; }
-  @media screen and (max-width: 414px) {
+  margin-right: 120px; }
+  @media screen and (max-width: 800px) {
     .container {
-      margin-top: 110px;
       margin-right: 0px; } }
 
 #About {
