@@ -8,7 +8,7 @@
 // $tan: rgba(204,146,55, 1);
 // $brown: rgba(178,131,57, 1); 
 $break-small: 800px;
-$break-large: 1440px;
+$break-large: 1600px;
 
 $softgreen: rgba(108,204,55, 1);
 $darkgreen: rgba(101,178,57, 1);
@@ -16,6 +16,7 @@ $softblue: rgba(94,109,255, 1);
 $darkblue: rgba(48,60,178, 1);
 $orange: rgba(255,99,36, 1);
 
+ 
 $lightgreen: rgba(108,204,55, 0.3);
 
 $font-family: 'Lato', sans-serif;
@@ -25,6 +26,15 @@ body {
   font-family: $font-family;
 }
 
+.container {
+    background-color: white;
+    margin: 0 auto;
+    width: 80%;
+
+  @media screen and (max-width: $break-small) {
+    width: 100%;
+  }
+}
 .profile-image {
   min-width: 200px;
   max-width: 20%;
@@ -36,39 +46,48 @@ body {
   display: block;
   margin: 0 auto;
   padding-top: 100px;
+  > ul {
+    float: left;
+    list-style-type: none;
+    > .name {
+      font-weight: bold;
+      font-size: 20px;
+    }
+  }
 }
 .icon-bar {
   width: 125px;
   position: fixed;
   top: 200px;
-  right: 30px;
+  right: 20px;
     .item {
       width: 100%;
-      // width: 125px;
       height: 100px;
       line-height: 100px;
       margin: 5px;
       text-align: center;
       float: left;
       font-size: 20px;
-      background-color: $softblue;
+      background-color: black;
       color: white;
       cursor: pointer;
       box-sizing: border-box;
       transition: background-color 0.3s;
 
       &:hover {
-        background-color: $softgreen;
+        color: silver;
+        // background-color: $softgreen;
       }
       &.active {
-        background-color: $orange;
+        color: white;
+        background-color: $softblue;
       }
       label {
         cursor: pointer;
       }
     }
   @media screen and (min-width: $break-large) {
-    width: 200px;
+    width: 175px;
     .item {
       height: 150px;
       line-height: 150px;
@@ -91,32 +110,20 @@ body {
   }
 }
 
-.container {
-  margin-top: 0px;
-  margin-right: 120px;
-  // padding: 10px;
-  @media screen and (max-width: $break-small) {
-    // margin-top: 110px;
-    margin-right: 0px;
-  }
-}
 #About {
   // background-color: white;
   height: 700px;
 }
 
 #Resume {
-  background-color: white;
   height: 1200px;
 }
 
 #Projects {
-  background-color: white;
   height: 1000px;
 }
 
 #Music {
-  background-color: white;
   height: 1500px;
 }
 

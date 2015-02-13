@@ -1721,6 +1721,14 @@
 body {
   font-family: 'Lato', sans-serif; }
 
+.container {
+  background-color: white;
+  margin: 0 auto;
+  width: 80%; }
+  @media screen and (max-width: 800px) {
+    .container {
+      width: 100%; } }
+
 .profile-image {
   min-width: 200px;
   max-width: 20%;
@@ -1731,12 +1739,18 @@ body {
   display: block;
   margin: 0 auto;
   padding-top: 100px; }
+  .profile > ul {
+    float: left;
+    list-style-type: none; }
+    .profile > ul > .name {
+      font-weight: bold;
+      font-size: 20px; }
 
 .icon-bar {
   width: 125px;
   position: fixed;
   top: 200px;
-  right: 30px; }
+  right: 20px; }
   .icon-bar .item {
     width: 100%;
     height: 100px;
@@ -1745,21 +1759,22 @@ body {
     text-align: center;
     float: left;
     font-size: 20px;
-    background-color: #5e6dff;
+    background-color: black;
     color: white;
     cursor: pointer;
     box-sizing: border-box;
     -webkit-transition: background-color 0.3s;
             transition: background-color 0.3s; }
     .icon-bar .item:hover {
-      background-color: #6ccc37; }
+      color: silver; }
     .icon-bar .item.active {
-      background-color: #ff6324; }
+      color: white;
+      background-color: #5e6dff; }
     .icon-bar .item label {
       cursor: pointer; }
-  @media screen and (min-width: 1440px) {
+  @media screen and (min-width: 1600px) {
     .icon-bar {
-      width: 200px; }
+      width: 175px; }
       .icon-bar .item {
         height: 150px;
         line-height: 150px; } }
@@ -1776,26 +1791,16 @@ body {
         .icon-bar .item:nth-last-child(1) {
           border-right: 0px; } }
 
-.container {
-  margin-top: 0px;
-  margin-right: 120px; }
-  @media screen and (max-width: 800px) {
-    .container {
-      margin-right: 0px; } }
-
 #About {
   height: 700px; }
 
 #Resume {
-  background-color: white;
   height: 1200px; }
 
 #Projects {
-  background-color: white;
   height: 1000px; }
 
 #Music {
-  background-color: white;
   height: 1500px; }
 
 .fixed {
