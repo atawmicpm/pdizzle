@@ -21,7 +21,7 @@
   }]);
 
   // Navigation directive, this 
-  app.directive('navigation', ['smoothScroll', function(smoothScroll) {
+  app.directive('navigation', ['$timeout', 'smoothScroll', function($timeout, smoothScroll) {
     return {
       // why pollute parent scope?
       scope: {},
@@ -51,33 +51,48 @@
         };
 
         this.addItem = function(elem, name) {
-          var top = document.getElementById(name).offsetTop,
-              bottom = top + document.getElementById(name).offsetHeight;
+          var section = document.getElementById(name),
+              top = section.offsetTop,
+              bottom = top + section.offsetHeight;
+
+          console.log('name', name);
+          console.log('top', top);
+          console.log('bottom', bottom);
+          console.log(document.documentElement.scrollHeight);
 
           $scope.items.push({
             elem: elem,
             top: top,
             bottom: bottom
           });
+
         };
       },
 
       link: function(scope, elem, attrs) {
-        angular.element(window).bind('scroll', function() {
+        function findActive() {
           var scrollPos = window.scrollY;
 
           angular.forEach(scope.items, function(item) {
             if (item.top <= scrollPos && item.bottom >= scrollPos) {
               scope.setActive(item.elem);
             }
-          });
+          });  
+        }
+
+        $timeout(function() {
+          findActive();
+        }, 100);
+
+        angular.element(window).bind('scroll', function() {
+          findActive();
         });
       }
     };
   }]);
 
   // Navigation items add themselves to navigation directive controller
-  app.directive('item', function() {
+  app.directive('item', ['$timeout', function($timeout) {
     return {
       scope: {},
       restrict: 'E',
@@ -90,7 +105,11 @@
         scope.name = attrs.name;
         scope.icon = attrs.icon;
 
-        navController.addItem(elem, scope.name);
+        // wait until DOM is done rendering before processing
+        // height and width with addItem
+        $timeout(function() {
+          navController.addItem(elem, scope.name);
+        }, 100);
 
         elem.bind('click', function() {
           navController.scrollTo(scope.name);
@@ -98,7 +117,7 @@
 
       }
     };
-  });
+  }]);
 
   // About template
   app.directive('about', function() {
@@ -132,15 +151,6 @@
     };
   });
  
-  // directive needs to have HTML for navigation
-  // CSS must position the navigation correctly initially
-  // directive will reposition the navigation on window size change and scroll
-  // directive will determine all anchor point names based on link
-  // names eg. a href="#resume" will scrollTo <a target="#resume">
-  // directive will determine sizes and locations of all page sections
-  // directive will do a smooth scrollTo
-  // directive will update navigation active as it passes each directive
-
 })();
 
 },{"../../bower_components/ngSmoothScroll/angular-smooth-scroll":2,"angular":3}],2:[function(require,module,exports){
